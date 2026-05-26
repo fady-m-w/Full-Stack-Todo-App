@@ -2,6 +2,7 @@ import InputErrorMsg from "../components/InputErrorMsg";
 import Button from "../components/ui/Button";
 import Input from "../components/ui/Input";
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { REGISTER_FORM } from "../data";
 
 interface IFormInput {
   username: string;
@@ -15,10 +16,27 @@ const RegisterPage = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<IFormInput>();
+
+  // ** Handlers
   const onSubmit: SubmitHandler<IFormInput> = (data) =>
     console.log("DATA", data);
 
-  console.log(errors);
+  // ** Renders
+  const renderRegisterForm = REGISTER_FORM.map(
+    ({ name, placeholder, type, validation }, idx) => {
+      return (
+        <div key={idx}>
+          <Input
+            type={type}
+            placeholder={placeholder}
+            {...register(name, validation)}
+          />
+
+          {errors[name] && <InputErrorMsg msg={errors[name]?.message} />}
+        </div>
+      );
+    },
+  );
 
   return (
     <div className="max-w-md mx-auto">
@@ -27,53 +45,7 @@ const RegisterPage = () => {
       </h2>
 
       <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-        <div>
-          <Input
-            placeholder="Username"
-            {...register("username", {
-              required: true,
-              minLength: 5,
-            })}
-          />
-
-          {errors?.username && errors.username.type === "required" && (
-            <InputErrorMsg msg="Username Is Required." />
-          )}
-          {errors?.username && errors.username.type === "minLength" && (
-            <InputErrorMsg msg="Username Should Be At Least 5 Charactars." />
-          )}
-        </div>
-
-        <div>
-          <Input
-            placeholder="Emaill address"
-            {...register("email", {
-              required: true,
-              pattern: /^[^@ ]+@[^@ ]+\.[^@ .]{2,}$/,
-            })}
-          />
-
-          {errors?.email && errors.email.type === "required" && (
-            <InputErrorMsg msg="Email Is Required." />
-          )}
-          {errors?.email && errors.email.type === "pattern" && (
-            <InputErrorMsg msg="Not Valid Email." />
-          )}
-        </div>
-
-        <div>
-          <Input
-            placeholder="Password"
-            {...register("password", { required: true, minLength: 6 })}
-          />
-
-          {errors?.password && errors.password.type === "required" && (
-            <InputErrorMsg msg="Username Is Required." />
-          )}
-          {errors?.password && errors.password.type === "minLength" && (
-            <InputErrorMsg msg="Password Should Be At Least 6 Charactars." />
-          )}
-        </div>
+        {renderRegisterForm}
 
         <Button fullWidth>Register</Button>
       </form>
