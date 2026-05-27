@@ -23,7 +23,7 @@ const Navbar = () => {
               <NavLink to="/todos">todos</NavLink>
             </li>
             <li className="duration-200 text-lg">
-              <NavLink to="/profile">Profile</NavLink>
+              <NavLink to="/profile">{userData.user.email}</NavLink>
             </li>
             <button
               className="bg-indigo-500 text-white p-2 rounded-md cursor-pointer"

@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { AxiosError } from "axios";
 import type { IErrorResponse } from "../interfaces";
+import { Link } from "react-router";
 
 interface IFormInput {
   username: string;
@@ -35,10 +36,10 @@ const RegisterPage = () => {
       const { status } = await api.post("/auth/local/register", data);
       if (status === 200) {
         toast.success(
-          "You will be redirected to the login page in 4 seconds to log in.",
+          "You will be redirected to the login page in 2 seconds to log in.",
           {
             position: "bottom-center",
-            duration: 4000,
+            duration: 1500,
             style: {
               backgroundColor: "black",
               color: "white",
@@ -46,13 +47,17 @@ const RegisterPage = () => {
             },
           },
         );
+
+        setTimeout(() => {
+          location.replace("/login");
+        }, 2000);
       }
     } catch (error) {
       const errorObj = error as AxiosError<IErrorResponse>;
       console.log();
       toast.error(`${errorObj.response?.data.error.message}`, {
         position: "bottom-center",
-        duration: 4000,
+        duration: 1500,
         style: {
           backgroundColor: "black",
           color: "white",
@@ -93,6 +98,16 @@ const RegisterPage = () => {
         <Button fullWidth isLoading={isLoading}>
           Register
         </Button>
+
+        <p className="text-center text-sm space-x-2">
+          <span>have an account?</span>
+          <Link
+            to={"/login"}
+            className="underline text-indigo-600 font-semibold"
+          >
+            Login
+          </Link>
+        </p>
       </form>
     </div>
   );
