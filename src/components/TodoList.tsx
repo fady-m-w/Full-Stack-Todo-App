@@ -18,15 +18,21 @@ const TodoList = () => {
   // ** STATES
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const todoObj = {
+  const todoEditObj = {
     id: 0,
     documentId: "",
     title: "",
     Description: "",
   };
-  const [todoToEdit, setTodoToEdit] = useState<ITodo>(todoObj);
-  const [originalTodo, setOriginalTodo] = useState<ITodo>(todoObj);
+  const todoAddObj = {
+    title: "",
+    Description: "",
+  };
+  const [todoToAdd, setTodoToAdd] = useState(todoAddObj);
+  const [todoToEdit, setTodoToEdit] = useState<ITodo>(todoEditObj);
+  const [originalTodo, setOriginalTodo] = useState<ITodo>(todoEditObj);
 
   const { isLoading, data } = useAuthenticatedQuery({
     queryKey: ["todoList"],
@@ -40,8 +46,16 @@ const TodoList = () => {
   const queryClient = useQueryClient();
 
   // **HANDLERS
+  const onCloseAddModal = () => {
+    setTodoToAdd(todoAddObj);
+    setIsAddModalOpen(false);
+  };
+  const onOpenAddModal = () => {
+    setIsAddModalOpen(true);
+  };
+
   const onCloseEditModal = () => {
-    setTodoToEdit(todoObj);
+    setTodoToEdit(todoEditObj);
     setIsEditModalOpen(false);
   };
   const onOpenEditModal = (todo: ITodo) => {
@@ -55,8 +69,19 @@ const TodoList = () => {
     setTodoToEdit(todo);
   };
   const closeDeleteModal = () => {
-    setTodoToEdit(todoObj);
+    setTodoToEdit(todoEditObj);
     setIsDeleteModalOpen(false);
+  };
+
+  const onChangeAddHandler = (
+    evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = evt.target;
+
+    setTodoToAdd({
+      ...todoToAdd,
+      [name]: value,
+    });
   };
 
   const onChangeHandler = (
@@ -92,6 +117,35 @@ const TodoList = () => {
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const submitAddHandler = async (evt: SubmitEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+
+    setIsUpdating(true);
+
+    const { title, Description } = todoToAdd;
+
+    try {
+      const { status } = await api.post(
+        `/todos`,
+        { data: { title, Description } },
+        {
+          headers: {
+            Authorization: `Bearer ${userData.jwt}`,
+          },
+        },
+      );
+
+      if (status === 200 || status === 201) {
+        onCloseAddModal();
+        queryClient.invalidateQueries({ queryKey: ["todoList"] });
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -153,6 +207,12 @@ const TodoList = () => {
 
   return (
     <div className="space-y-1">
+      <div className="w-fit mx-auto my-10">
+        <Button size={"sm"} onClick={onOpenAddModal}>
+          Post A New Todo
+        </Button>
+      </div>
+
       {data.todos.length ? (
         data.todos.map((todo: ITodo, idx: number) => {
           return (
@@ -181,7 +241,39 @@ const TodoList = () => {
       ) : (
         <h3>No Todos Yet!</h3>
       )}
-      {/* Edit Todo Modal */}
+
+      {/* ADD TODO MODAl */}
+      <Modal
+        isOpen={isAddModalOpen}
+        closeModel={onCloseAddModal}
+        title="Edit This Todo"
+      >
+        <form className="space-y-3" onSubmit={submitAddHandler}>
+          <Input
+            name="title"
+            value={todoToAdd.title}
+            onChange={onChangeAddHandler}
+          />
+          <Textarea
+            name="Description"
+            value={todoToAdd.Description}
+            onChange={onChangeAddHandler}
+          />
+          <div className="flex items-center space-x-3">
+            <Button
+              className="bg-indigo-700 hover:bg-indigo-800"
+              isLoading={isUpdating}
+            >
+              Done
+            </Button>
+            <Button type="button" variant={"cancel"} onClick={onCloseAddModal}>
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* EDIT TODO MODAL */}
       <Modal
         isOpen={isEditModalOpen}
         closeModel={onCloseEditModal}
