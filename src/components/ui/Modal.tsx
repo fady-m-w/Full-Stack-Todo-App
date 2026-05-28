@@ -3,17 +3,25 @@ import {
   DialogPanel,
   DialogTitle,
   DialogBackdrop,
+  Description,
 } from "@headlessui/react";
 import type { ReactNode } from "react";
 
 interface Iprops {
   isOpen: boolean;
   closeModel: () => void;
-  title?: string;
   children: ReactNode;
+  title?: string;
+  description?: string;
 }
 
-const Modal = ({ isOpen, closeModel, title, children }: Iprops) => {
+const Modal = ({
+  isOpen,
+  closeModel,
+  title,
+  children,
+  description,
+}: Iprops) => {
   return (
     <>
       <Dialog open={isOpen} onClose={closeModel} className="relative z-50">
@@ -34,7 +42,11 @@ const Modal = ({ isOpen, closeModel, title, children }: Iprops) => {
                 {title}
               </DialogTitle>
             )}
-
+            {description && (
+              <Description className={"mt-2"}>
+                <p className="text-sm text-gray-500">{description}</p>
+              </Description>
+            )}
             <div className="mt-4">{children}</div>
           </DialogPanel>
         </div>
