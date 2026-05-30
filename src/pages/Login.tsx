@@ -54,7 +54,6 @@ const LoginPage = () => {
       }
     } catch (error) {
       const errorObj = error as AxiosError<IErrorResponse>;
-      console.log();
       toast.error(`${errorObj.response?.data.error.message}`, {
         position: "bottom-center",
         duration: 1500,

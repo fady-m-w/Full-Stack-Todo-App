@@ -1,6 +1,6 @@
 const TodoSkeleton = () => {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between animate-pulse">
       <div>
         <div className="w-32 h-2 bg-gray-200 rounded-full dark:bg-gray-400"></div>
       </div>
