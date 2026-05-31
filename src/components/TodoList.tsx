@@ -26,6 +26,7 @@ const TodoList = () => {
     },
   });
   const queryClient = useQueryClient();
+
   // ** STATES
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
